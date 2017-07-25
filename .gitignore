@@ -1,0 +1,8 @@
+# Created by .ignore support plugin (hsz.mobi)
+.idea/
+tda_poc.iml
+/.idea/
+pom.xml
+src/main/java/pl/edu/uj/student/kownacki/aron/tda/batch/SampleBatchApplication.java
+src/test/
+target/

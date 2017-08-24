@@ -1,56 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Hello WebSocket</title>
+    <title>Twitter stream experimental</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/main.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
     <script src="/app.js"></script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="/report-theme.js"></script>
+    <script src="/report.js"></script>
+
 </head>
+<!--<body style="background-color:black;">-->
 <body>
 <noscript><h2 style="color: #ff0000">Seems your browser doesn't support Javascript! Websocket relies on Javascript being
     enabled. Please enable
     Javascript and reload this page!</h2></noscript>
-<div id="main-content" class="container">
-    <div class="row">
-        <div class="col-md-6">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="connect">WebSocket connection:</label>
-                    <button id="start" class="btn btn-default" type="submit">Connect</button>
-                    <button id="stop" class="btn btn-default" type="submit">Connect</button>
-                    <button id="connect" class="btn btn-default" type="submit">Connect</button>
-                    <button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect
-                    </button>
-                </div>
-            </form>
-        </div>
-        <div class="col-md-6">
-            <form class="form-inline">
-                <div class="form-group">
-                    <label for="name">What is your name?</label>
-                    <input type="text" id="name" class="form-control" placeholder="Your name here...">
-                </div>
-                <button id="send" class="btn btn-default" type="submit">Send</button>
-            </form>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-md-12">
-            <table id="conversation" class="table table-striped">
-                <thead>
-                <tr>
-                    <th>Greetings</th>
-                </tr>
-                </thead>
-                <tbody id="greetings">
-                </tbody>
-            </table>
-        </div>
-    </div>
-    </form>
+<!--<div>-->
+    <!--<p class="greeting-id">The ID is </p>-->
+    <!--<p class="greeting-content">The content is </p>-->
+<!--</div>-->
+
+<button id="button" class="autocompare">Update</button>
+<div id="gap" style="height: 50px; min-width: 100%">
 </div>
+<div id="container" style="height: 600px; min-width: 100%"></div>
+<!--<div id="main-content" class="container">-->
+    <!--<div class="row">-->
+        <!--<div class="col-md-6">-->
+            <!--<form class="form-inline">-->
+                <!--<div class="form-group">-->
+                    <!--<button id="connect" class="btn btn-default" type="submit">Connect</button>-->
+                    <!--<button id="disconnect" class="btn btn-default" type="submit" disabled="disabled">Disconnect</button>-->
+                <!--</div>-->
+            <!--</form>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+            <!--<table id="stream" class="table table-striped">-->
+                <!--<thead>-->
+                <!--<tr>-->
+                    <!--<th>Spark output from Twitter stream</th>-->
+                <!--</tr>-->
+                <!--</thead>-->
+                <!--<tbody id="output">-->
+                <!--</tbody>-->
+            <!--</table>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--</form>-->
+<!--</div>-->
 </body>
 </html>

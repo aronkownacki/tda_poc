@@ -1,4 +1,4 @@
-package pl.edu.uj.student.kownacki.aron.tda.batch;
+package pl.edu.uj.student.kownacki.aron.tda.batch.config;
 
 /**
  * Created by Aron Kownacki on 10.07.2017.
@@ -16,13 +16,12 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        config.enableSimpleBroker("/topic");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/stream/output");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket").withSockJS();
+        registry.addEndpoint("/websocket").withSockJS();
     }
 
 }

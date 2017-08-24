@@ -17,23 +17,17 @@
 package pl.edu.uj.student.kownacki.aron.tda.batch;
 
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import lombok.extern.slf4j.Slf4j;
 
-@Configuration
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
-@ComponentScan
-@EnableScheduling
+
+@SpringBootApplication
 @Slf4j
-public class SampleBatchApplication {
+public class TDASpringApplicationRunner {
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(
-                SampleBatchApplication.class, args);
+            TDASpringApplicationRunner.class, args);
     }
 }

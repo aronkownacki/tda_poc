@@ -1,4 +1,4 @@
-package pl.edu.uj.student.kownacki.aron.tda.batch;
+package pl.edu.uj.student.kownacki.aron.tda.batch.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -7,21 +7,21 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import pl.edu.uj.student.kownacki.aron.tda.batch.web.Greeting;
+import pl.edu.uj.student.kownacki.aron.tda.batch.model.StreamOutput;
+import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TwitterTask;
 
 /**
  * Created by Aron Kownacki on 20.06.2017.
  */
 @RestController
-public class HelloController {
-
-    @Autowired
-    private SimpMessagingTemplate template;
-
-
+@RequestMapping("/stream")
+public class StreamController {
 
     @Autowired
     private TwitterTask task;
+
+    @Autowired
+    private SimpMessagingTemplate template;
 
     @RequestMapping("/start")
     public void start() {
@@ -35,7 +35,7 @@ public class HelloController {
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public void newPost(@RequestBody String newPost) {
-        template.convertAndSend("/topic/greetings", new Greeting("new: " + newPost));
+        template.convertAndSend("/stream/output", new StreamOutput("new: " + newPost));
     }
 
 }

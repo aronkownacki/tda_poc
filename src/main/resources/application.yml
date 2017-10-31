@@ -13,8 +13,8 @@ spring:
       enabled: true
       path: '/h2'
   jpa.hibernate.ddl-auto: 'update'
-  # mongo ()
-#mongodb.storage.databaseDir: 'e:/tmp/mongo/embedded'
+  # mongo
+  data.mongodb.port: 27017
   mongodb.embedded:
     version: '3.2.2'
     features: SYNC_DELAY, TEXT_SEARCH, STORAGE_ENGINE

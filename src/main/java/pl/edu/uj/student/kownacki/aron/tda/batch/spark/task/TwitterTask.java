@@ -11,13 +11,18 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.FlatMapFunction;
+import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.twitter.TwitterUtils;
+import org.bson.Document;
 import org.springframework.web.client.RestTemplate;
 
+import com.mongodb.spark.MongoSpark;
 import lombok.extern.slf4j.Slf4j;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
+import pl.edu.uj.student.kownacki.aron.tda.batch.model.Tweet;
 import twitter4j.HashtagEntity;
 import twitter4j.Status;
 import twitter4j.auth.Authorization;
@@ -100,15 +105,41 @@ public class TwitterTask implements Serializable {
     private void processStream(Authorization twitterAuth) {
         RestTemplate restTemplate = new RestTemplate();
         String[] filter = Country.getAllHashtags();
+        SQLContext sqlContext = SQLContext.getOrCreate(sc.sparkContext().sc());
         TwitterUtils.createStream(sc, twitterAuth, filter).foreachRDD(rdd -> {
             if (!rdd.isEmpty()) {
 
                 long totalCount = rdd.count();
+
                 Map<Country, Long> result = rdd.flatMap(s -> extractCountries(s).iterator()).collect().stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
                 result.put(Country.EU, result.getOrDefault(Country.EU, 0L) + totalCount);
 
                 restTemplate.postForEntity("http://localhost:10400/report/update", result, Map.class);
+
+                //todo should be processed once with Map<Country, Long> result extraction
+                JavaRDD<Document> tweetsImplic = rdd.map(s -> Tweet.builder()
+                    .countries(extractCountries(s))
+                    .favoriteCountLambda(0)
+                    .favoriteCount(s.isFavorited() ? s.getFavoriteCount() : 0)
+                    .statusId(s.getId())
+                    .receivedAt(s.getCreatedAt().getTime())
+                    .build()).map(tweet -> {
+
+                    Document document = new Document();
+                    //todo fix enum
+//                    document.put("countries", tweet.getCountries());
+                    document.put("favoriteCountLambda", tweet.getFavoriteCountLambda());
+                    document.put("favoriteCount", tweet.getFavoriteCount());
+                    document.put("statusId", tweet.getStatusId());
+                    document.put("receivedAt", tweet.getReceivedAt());
+                    return document;
+                });
+
+
+//                MongoSpark.save(tweetsExpl, Tweet.class);
+//                Dataset<Row> dataFrame = sqlContext.createDataFrame(rdd, Status.class);
+                MongoSpark.save(tweetsImplic);
             }
         });
     }

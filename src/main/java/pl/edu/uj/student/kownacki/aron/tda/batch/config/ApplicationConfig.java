@@ -4,6 +4,7 @@ import java.util.concurrent.Executor;
 
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaSparkContext;
+import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +49,14 @@ public class ApplicationConfig {
     public JavaSparkContext javaSparkContext(JavaStreamingContext javaStreamingContext) {
         JavaSparkContext sc = javaStreamingContext.sparkContext();
         sc.setLogLevel("ERROR");
+
         return sc;
+    }
+
+    @Bean
+    public SparkSession sparkSession(JavaSparkContext javaSparkContext) {
+
+        return new SparkSession(javaSparkContext.sc());
     }
 
     @Bean
@@ -59,6 +67,9 @@ public class ApplicationConfig {
         conf.set("spark.cores.max", "4");
         conf.set("spark.executor.instances", "2");
         conf.set("spark.dynamicAllocation.enabled", "false");
+
+        conf.set("spark.mongodb.input.uri", "mongodb://127.0.0.1/test.tweets");
+        conf.set("spark.mongodb.output.uri", "mongodb://127.0.0.1/test.tweets");
 
         return new JavaStreamingContext(conf, Duration.apply(10000));
     }

@@ -2,15 +2,14 @@ package pl.edu.uj.student.kownacki.aron.tda.batch.model;
 
 import static com.google.common.collect.Sets.newHashSet;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Set;
 
 /**
  * Created by Aron Kownacki on 14.08.2017.
  */
-public enum Country {
-
-
+public enum Country implements Serializable{
     AUSTRIA(newHashSet("auxit", "auexit", "ausexit", "autrexit", "austrexit", "oustria", "outstria")),
     BELGIUM(newHashSet("bexit", "belxit", "bexlexit", "byegium", "belgexit")),
     BULGARIA(newHashSet("bulgexit")),

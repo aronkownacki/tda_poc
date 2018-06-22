@@ -16,6 +16,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TwitterTask;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.auth.Authorization;
+import twitter4j.auth.AuthorizationFactory;
+import twitter4j.conf.ConfigurationBuilder;
 
 /**
  * Created by Aron Kownacki on 20.06.2017.
@@ -39,8 +44,8 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public TwitterTask twitterTask(JavaStreamingContext javaStreamingContext) throws Exception {
-        TwitterTask twitterTask = new TwitterTask(javaStreamingContext);
+    public TwitterTask twitterTask(JavaStreamingContext javaStreamingContext, Authorization authorization) throws Exception {
+        TwitterTask twitterTask = new TwitterTask(javaStreamingContext, authorization);
         twitterTask.start();
         return twitterTask;
     }
@@ -73,4 +78,27 @@ public class ApplicationConfig {
 
         return new JavaStreamingContext(conf, Duration.apply(10000));
     }
+
+    @Bean
+    public twitter4j.conf.Configuration configuration() {
+        ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
+                .setOAuthConsumerKey("kH4RSvKyqz9mH9P3RDf1xyBwr")
+                .setOAuthConsumerSecret("EYa00u0wpdLY9Z21a5yd2jX1BQMALPFmF1GgjQA7eDZQyiosjR")
+                .setOAuthAccessToken("871418083407265792-IqNyZeV72b692P81LRWdoFzHJsxIDk2")
+                .setOAuthAccessTokenSecret("MAlFDhMfoPwTINB1gZ4a95Dc8CsBpkPKYnjSmLZpUIxQZ")
+                .setTweetModeExtended(true);
+
+        return configurationBuilder.build();
+    }
+
+    @Bean
+    public Authorization authorization(twitter4j.conf.Configuration configuration) {
+        return AuthorizationFactory.getInstance(configuration);
+    }
+
+    @Bean
+    public Twitter twitterApi(twitter4j.conf.Configuration configuration) {
+        return new TwitterFactory(configuration).getInstance();
+    }
+
 }

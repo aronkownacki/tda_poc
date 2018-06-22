@@ -1,35 +1,25 @@
 package pl.edu.uj.student.kownacki.aron.tda.batch.spark.task;
 
-import static java.util.stream.Collectors.toSet;
+import static pl.edu.uj.student.kownacki.aron.tda.batch.utils.TwitterHelper.extractCountries;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.spark.api.java.JavaRDD;
-import org.apache.spark.api.java.function.FlatMapFunction;
-import org.apache.spark.sql.SQLContext;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.twitter.TwitterUtils;
 import org.bson.Document;
 import org.springframework.web.client.RestTemplate;
 
+import com.google.gson.Gson;
 import com.mongodb.spark.MongoSpark;
 import lombok.extern.slf4j.Slf4j;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Tweet;
-import twitter4j.HashtagEntity;
-import twitter4j.Status;
+import pl.edu.uj.student.kownacki.aron.tda.batch.utils.TwitterHelper;
 import twitter4j.auth.Authorization;
-import twitter4j.auth.AuthorizationFactory;
-import twitter4j.conf.Configuration;
-import twitter4j.conf.ConfigurationContext;
-
 
 /**
  * Created by Aron Kownacki on 05.06.2017.
@@ -41,104 +31,41 @@ public class TwitterTask implements Serializable {
 
     private Thread thread;
 
-    private RestTemplate restTemplate = new RestTemplate();
-
-//    private Consumer<String> postStatus = (status) -> {
-//        try {
-//            Thread.sleep(500);
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
-//        restTemplate.postForEntity("http://localhost:10400/stream/new", status, String.class);
-//    };
-
-    public TwitterTask(JavaStreamingContext sc) throws InterruptedException {
-
-        System.setProperty("twitter4j.oauth.consumerKey", "kH4RSvKyqz9mH9P3RDf1xyBwr");
-        System.setProperty("twitter4j.oauth.consumerSecret", "EYa00u0wpdLY9Z21a5yd2jX1BQMALPFmF1GgjQA7eDZQyiosjR");
-        System.setProperty("twitter4j.oauth.accessToken", "871418083407265792-IqNyZeV72b692P81LRWdoFzHJsxIDk2");
-        System.setProperty("twitter4j.oauth.accessTokenSecret", "MAlFDhMfoPwTINB1gZ4a95Dc8CsBpkPKYnjSmLZpUIxQZ");
-
-
-        Configuration twitterConf = ConfigurationContext.getInstance();
-        Authorization twitterAuth = AuthorizationFactory.getInstance(twitterConf);
-
+    public TwitterTask(JavaStreamingContext sc, Authorization twitterAuth) throws InterruptedException {
         this.sc = sc;
         processStream(twitterAuth);
     }
 
-    private void hashtagStream(Authorization twitterAuth) {
-        FlatMapFunction<Status, HashtagEntity> toHashtag = (FlatMapFunction<Status, HashtagEntity>) status -> Arrays.asList(status.getHashtagEntities()).iterator();
-
-        TwitterUtils.createStream(sc, twitterAuth)
-            .flatMap(toHashtag)
-            .map(hashtag -> hashtag.getText().toLowerCase()).filter((hashtagString) -> hashtagString != null).foreachRDD(
-            rdd -> {
-                if (!rdd.isEmpty()) {
-                    String hashtags = rdd.map(hashtag -> "#" + hashtag + " ").reduce(String::concat);
-                    Thread.sleep(500);
-//                    postStatus.accept(hashtags);
-                }
-            });
-    }
-
-    private void polishStatusStream(Authorization twitterAuth) {
-//        String[] filter = {"trump"};
-        String[] filter = {"polexit", "brexit", "plexit"};
-        TwitterUtils.createStream(sc, twitterAuth, filter)
-            .map(Status::getText).foreachRDD(rdd -> {
-            if (!rdd.isEmpty()) {
-                List<String> statuses = rdd.collect();
-//                statuses.forEach(postStatus);
-            }
-        });
-    }
-
-    private void saveStream(Authorization twitterAuth) {
-
-        String[] filter = Country.getAllHashtags();
-        TwitterUtils.createStream(sc, twitterAuth, filter)
-            .map(Status::getText).filter(StringUtils::isNoneBlank).dstream().saveAsTextFiles("c:/tmp/tds_poc/tweets/", "json");
-    }
-
-    //todo add statuses persistance
     private void processStream(Authorization twitterAuth) {
         RestTemplate restTemplate = new RestTemplate();
         String[] filter = Country.getAllHashtags();
-        SQLContext sqlContext = SQLContext.getOrCreate(sc.sparkContext().sc());
         TwitterUtils.createStream(sc, twitterAuth, filter).foreachRDD(rdd -> {
             if (!rdd.isEmpty()) {
 
-                long totalCount = rdd.count();
+                long totalCount = rdd.filter(TwitterHelper::acceptedStatus).count();
 
-                Map<Country, Long> result = rdd.flatMap(s -> extractCountries(s).iterator()).collect().stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+                Map<Country, Long> result = rdd.filter(TwitterHelper::acceptedStatus).flatMap(s -> extractCountries(s).iterator()).collect().stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
 
                 result.put(Country.EU, result.getOrDefault(Country.EU, 0L) + totalCount);
 
                 restTemplate.postForEntity("http://localhost:10400/report/update", result, Map.class);
 
                 //todo should be processed once with Map<Country, Long> result extraction
-                JavaRDD<Document> tweetsImplic = rdd.map(s -> Tweet.builder()
-                    .countries(extractCountries(s))
-                    .favoriteCountLambda(0)
-                    .favoriteCount(s.isFavorited() ? s.getFavoriteCount() : 0)
-                    .statusId(s.getId())
-                    .receivedAt(s.getCreatedAt().getTime())
-                    .build()).map(tweet -> {
+                JavaRDD<Document> tweetsImplic = rdd.filter(TwitterHelper::acceptedStatus)
+                        .map(status -> Tweet.builder().countries(extractCountries(status)).favoriteCountLambda(0).favoriteCount(status.isFavorited() || status.isRetweeted() ? status.getFavoriteCount() : 0).statusId(status.getId())
+                                .receivedAt(status.getCreatedAt().getTime()).build()).map(tweet -> {
+                            log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + tweet.getCountries());
+                            Document document = new Document();
+                            document.put("countries", new Gson().toJson(tweet.getCountries()));
+                            document.put("favoriteCountLambda", tweet.getFavoriteCountLambda());//todo count fav and retweets
+                            document.put("favoriteCount", tweet.getFavoriteCount());
+                            document.put("statusId", tweet.getStatusId());
+                            document.put("receivedAt", tweet.getReceivedAt());
+                            return document;
+                        });
 
-                    Document document = new Document();
-                    //todo fix enum
-//                    document.put("countries", tweet.getCountries());
-                    document.put("favoriteCountLambda", tweet.getFavoriteCountLambda());
-                    document.put("favoriteCount", tweet.getFavoriteCount());
-                    document.put("statusId", tweet.getStatusId());
-                    document.put("receivedAt", tweet.getReceivedAt());
-                    return document;
-                });
-
-
-//                MongoSpark.save(tweetsExpl, Tweet.class);
-//                Dataset<Row> dataFrame = sqlContext.createDataFrame(rdd, Status.class);
+                //                MongoSpark.save(tweetsExpl, Tweet.class);
+                //                Dataset<Row> dataFrame = sqlContext.createDataFrame(rdd, Status.class);
                 MongoSpark.save(tweetsImplic);
             }
         });
@@ -158,13 +85,5 @@ public class TwitterTask implements Serializable {
     public void stop() {
         sc.stop();
         thread.interrupt();
-    }
-
-    private static Set<Country> extractCountries(Status status) {
-        String statusHashtags = Arrays.stream(status.getHashtagEntities()).map(HashtagEntity::getText).collect(Collectors.joining(","));
-        return Arrays.stream(Country.values()).filter(
-            country -> country.getHashtags().stream().anyMatch(countryHashtag ->
-                statusHashtags.contains(countryHashtag) || status.getText().contains(countryHashtag))).collect(toSet());
-
     }
 }

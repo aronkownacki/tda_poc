@@ -40,7 +40,7 @@ public class ReportServiceImpl implements ReportService {
     //todo this is mock version
     private Map<Country, List<List<Double>>> buildFullReport() {
         LocalDateTime today = ZonedDateTime.now().toLocalDate().atStartOfDay();
-        return Arrays.stream(Country.values()).collect(toMap(c -> c, c -> {
+        return Arrays.stream(Country.values()).collect(toMap(country -> country, country -> {
             List<List<Double>> list = IntStream.range(0, 10).boxed().map(i -> asList((double) today.atZone(ZoneId.systemDefault()).minusDays(i).toEpochSecond() * 1000, (double) Math.round(Math.random() * 100))).collect(toList());
             list.sort((o1, o2) -> o1.get(0).compareTo(o2.get(0)));
             return list;

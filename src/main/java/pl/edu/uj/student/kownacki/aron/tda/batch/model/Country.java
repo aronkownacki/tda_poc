@@ -53,4 +53,8 @@ public enum Country implements Serializable{
     public static String[] getAllHashtags() {
         return Arrays.stream(Country.values()).flatMap(c -> c.getHashtags().stream()).toArray(String[]::new);
     }
+
+    public static Country fromValue(String value){
+        return LITHUANIA;
+    }
 }

@@ -27,8 +27,8 @@ import twitter4j.conf.ConfigurationBuilder;
  */
 @EnableAsync
 @EnableScheduling
-@EnableJpaRepositories(basePackages = "pl.edu.uj.student.kownacki.aron.tda.batch.dao")
-@EnableMongoRepositories(basePackages = "pl.edu.uj.student.kownacki.aron.tda.batch.mongo")
+@EnableJpaRepositories(basePackages = "pl.edu.uj.student.kownacki.aron.tda.batch.dao.jpa")
+@EnableMongoRepositories(basePackages = "pl.edu.uj.student.kownacki.aron.tda.batch.dao.mongo")
 @Configuration
 public class ApplicationConfig {
 

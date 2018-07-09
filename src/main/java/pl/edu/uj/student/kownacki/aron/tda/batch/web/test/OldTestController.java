@@ -17,10 +17,10 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import pl.edu.uj.student.kownacki.aron.tda.batch.dao.ReportDataRepository;
+import pl.edu.uj.student.kownacki.aron.tda.batch.dao.jpa.ReportDataRepository;
+import pl.edu.uj.student.kownacki.aron.tda.batch.dao.mongo.TweetRepository;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.StreamOutput;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Tweet;
-import pl.edu.uj.student.kownacki.aron.tda.batch.mongo.TweetRepository;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.TwitterException;

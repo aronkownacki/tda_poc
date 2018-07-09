@@ -4,16 +4,19 @@ import java.util.List;
 import java.util.Map;
 
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
+import pl.edu.uj.student.kownacki.aron.tda.batch.model.Granularity;
 
 /**
  * Created by Aron Kownacki on 14.08.2017.
  */
-public interface ReportService {
+public interface ReportDataService {
 
     List<List<Double>> getRandomReport(Country country);
 
-    List<List<Double>> getMonthlyReport(Country country);
+    List<List<Double>> getReport(Country country, Granularity granularity);
 
     void update(Map<Country, Long> updateMap);
+
+    void aggregate(Granularity granularity);
 
 }

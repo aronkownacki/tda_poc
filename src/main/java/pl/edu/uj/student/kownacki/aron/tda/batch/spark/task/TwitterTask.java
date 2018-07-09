@@ -56,7 +56,7 @@ public class TwitterTask implements Serializable {
                                 .receivedAt(status.getCreatedAt().getTime()).build()).map(tweet -> {
                             log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + tweet.getCountries());
                             Document document = new Document();
-                            document.put("countries", new Gson().toJson(tweet.getCountries()));
+                            document.put("countries", tweet.getCountries().isEmpty() ? null : new Gson().toJson(tweet.getCountries()));
                             document.put("favoriteCountLambda", tweet.getFavoriteCountLambda());//todo count fav and retweets
                             document.put("favoriteCount", tweet.getFavoriteCount());
                             document.put("statusId", tweet.getStatusId());

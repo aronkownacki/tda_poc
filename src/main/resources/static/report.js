@@ -54,6 +54,7 @@ function createChart() {
 //        },
 
         chart: {
+            type: 'area',
             borderWidth: 2,
             height: 400 + (seriesCounter * 35)
         },
@@ -64,6 +65,10 @@ function createChart() {
 
         rangeSelector: {
             selected: 4
+        },
+
+        xAxis: {
+            ordinal: false
         },
 
         yAxis: {
@@ -85,6 +90,18 @@ function createChart() {
 //                showInNavigator: true
 //            }
 //        },
+
+        plotOptions: {
+            area: {
+                stacking: 'normal',
+                lineColor: '#666666',
+                lineWidth: 1,
+                marker: {
+                    lineWidth: 1,
+                    lineColor: '#666666'
+                }
+            }
+        },
 
         tooltip: {
             pointFormat: '<span style="color:{series.color}">{series.name}</span>: <b>{point.y}</b> ({point.change}%)<br/>',

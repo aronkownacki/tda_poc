@@ -4,6 +4,7 @@ import static java.util.stream.Collectors.toList;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,10 +21,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import pl.edu.uj.student.kownacki.aron.tda.batch.dao.ReportDataRepository;
+import pl.edu.uj.student.kownacki.aron.tda.batch.dao.jpa.ReportDataRepository;
+import pl.edu.uj.student.kownacki.aron.tda.batch.dao.mongo.TweetRepository;
+import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
+import pl.edu.uj.student.kownacki.aron.tda.batch.model.Granularity;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.StreamOutput;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Tweet;
-import pl.edu.uj.student.kownacki.aron.tda.batch.mongo.TweetRepository;
+import pl.edu.uj.student.kownacki.aron.tda.batch.scheduled.ScheduledJob;
 import twitter4j.ResponseList;
 import twitter4j.Status;
 import twitter4j.Twitter;
@@ -49,7 +53,10 @@ public class TestViewController {
     private TweetRepository tweetRepository;
 
     @Autowired
-    Twitter twitterApi;
+    private Twitter twitterApi;
+
+    @Autowired
+    private ScheduledJob scheduledJob;
 
     @RequestMapping("/sparkContext")
     public String sparkContext() {
@@ -58,7 +65,12 @@ public class TestViewController {
 
     @RequestMapping("/h2")
     public String test() {
-        return "H2 stores " + reportDataRepository.count() + " report entries";
+        StringBuilder byCountry = new StringBuilder();
+        Arrays.stream(Country.values()).forEach(country -> {
+            byCountry.append(country.name() + " - " + reportDataRepository.findByCountryNameAndGranularity(country, Granularity.MILLISECOND).size()+ "</br>");
+        });
+        String total = "H2 stores in total " + reportDataRepository.count() + " report entries";
+        return total + "</br>" + byCountry;
     }
 
     @RequestMapping("/webSocket")
@@ -69,8 +81,22 @@ public class TestViewController {
 
     @RequestMapping("/mongo")
     public String mongo() {
-        Tweet lastStroredStatus = tweetRepository.findAll(new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);
-        return "Mongo stores " + tweetRepository.count() + " tweets, last stored: <a target='_blank' href='https://twitter.com/i/web/status/" + lastStroredStatus.getStatusId() + "'>" + lastStroredStatus + "</>";
+//        List<Tweet> all = tweetRepository.findAll(new PageRequest(0, 300000, Sort.Direction.DESC, "receivedAt")).getContent();
+//        long emptyCount = all.stream().filter(t -> t.getCountries() != null && t.getCountries().size() == 0).count();
+//        Tweet lastEmpty = all.stream().filter(t -> t.getCountries() != null && t.getCountries().size() == 0).sorted((o1, o2) -> o1.getReceivedAt().compareTo(o2.getReceivedAt())).findFirst().get();
+
+        long lastDay = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1).toInstant().toEpochMilli();
+        Tweet lastEmpty = tweetRepository.findByCountriesIsNullAndReceivedAtGreaterThan(new Long(0), new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);;
+        Tweet lastStoredStatus = tweetRepository.findAll(new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);
+        String info = "Mongo stores " + tweetRepository.count() + " tweets, last stored: " + linkToStatus(lastStoredStatus);
+        String lastEmptyInfo = "Last invalid status: "  + linkToStatus(lastEmpty);
+
+//        return  "<br> empty countries: " + emptyCount + "<br> last empty: " + lastEmpty +"<br>" + info;
+        return  info + "<br>" + lastEmptyInfo;
+    }
+
+    private static String linkToStatus(Tweet status) {
+        return "<a target='_blank' href='https://twitter.com/i/web/status/" + status.getStatusId() + "'>" + status + "</a>";
     }
 
     @RequestMapping("/lookup/{statusId}")
@@ -86,6 +112,13 @@ public class TestViewController {
 //        System.out.print(gson.toJson(statuses.get(0)));
         return gson.toJson(statuses.get(0));
 //        return statuses.get(0).toString();
+    }
+
+
+    @RequestMapping("/force/runHourlyReportAggragation")
+    public String runHourlyReportAggragation() {
+        scheduledJob.runHourlyReportAggragation();
+        return "OK, workin'";
     }
 
     @RequestMapping("/lookup")

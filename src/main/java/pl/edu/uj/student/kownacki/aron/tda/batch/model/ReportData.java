@@ -36,4 +36,7 @@ public class ReportData {
 
     @Column(name = "count", nullable = false)
     private Long count;
+
+    @Column(name = "granularity", nullable = false)
+    private Granularity granularity;
 }

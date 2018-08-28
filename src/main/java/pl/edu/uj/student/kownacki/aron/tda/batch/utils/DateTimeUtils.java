@@ -11,9 +11,13 @@ public class DateTimeUtils {
     private static final long MILLISESONDS_IN_SECOND = 1000L;
 
     public static long getTimestampAtStartOfUnit(long timestampInMillis, TemporalUnit unit){
-        LocalDateTime localDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestampInMillis), ZoneId.systemDefault()).toLocalDateTime();
-        ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+        LocalDateTime localDateTime = ZonedDateTime.ofInstant(Instant.ofEpochMilli(timestampInMillis), getZone()).toLocalDateTime();
+        ZonedDateTime zonedDateTime = localDateTime.atZone(getZone());
         return zonedDateTime.truncatedTo(unit).toEpochSecond() * MILLISESONDS_IN_SECOND;
+    }
+
+    public static ZoneId getZone() {
+        return ZoneId.systemDefault();
     }
 
     public static long getNowInMillis() {

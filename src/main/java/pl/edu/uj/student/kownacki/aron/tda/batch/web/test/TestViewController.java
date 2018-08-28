@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
+import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.google.common.collect.Sets;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import pl.edu.uj.student.kownacki.aron.tda.batch.dao.jpa.ReportDataRepository;
@@ -55,7 +57,7 @@ public class TestViewController {
     @Autowired
     private Twitter twitterApi;
 
-    @Autowired
+    @Autowired(required = false)
     private ScheduledJob scheduledJob;
 
     @RequestMapping("/sparkContext")
@@ -121,11 +123,40 @@ public class TestViewController {
         return "OK, workin'";
     }
 
+    @RequestMapping("/force/runFavoriteCounting")
+    public String runFavoriteCounting() {
+        scheduledJob.runFavoriteCounting();
+        return "OK, workin'";
+    }
+
+    @RequestMapping("/force/updateMongo")
+    public String updateMongo() {
+        Tweet newTweet = new Tweet();
+        newTweet.setCountries(Sets.newHashSet(Country.EU));
+        newTweet.setFavoriteCount(1);
+
+        Document document = new Document();
+        document.put("countries", newTweet.getCountries().isEmpty() ? null : new Gson().toJson(newTweet.getCountries()));
+        document.put("favoriteCountLambda", newTweet.getFavoriteCountLambda());//todo count fav and retweets
+        document.put("favoriteCount", newTweet.getFavoriteCount());
+        document.put("statusId", newTweet.getStatusId());
+        document.put("receivedAt", newTweet.getReceivedAt());
+
+//        MongoSpark.save(document);
+        Tweet savedTweet = tweetRepository.save(newTweet);
+        savedTweet.setFavoriteCount(savedTweet.getFavoriteCount() + 1);
+         savedTweet = tweetRepository.save(savedTweet);
+        Boolean result = savedTweet.getCountries().contains(Country.EU);
+        tweetRepository.delete(savedTweet);
+
+        return "result: " + result;
+    }
+
     @RequestMapping("/lookup")
     public String lookupSmaple() {
         int twitterApiWindowInMinytes = 15;
         int twitterApiLookupIdLimitPerRequest = 100;
-        int twitterApiLookupRequestLimitPerWindow = 10; //todo should be 300;
+        int twitterApiLookupRequestLimitPerWindow = 300;
         int lookupStartTimeShiftInHours = 12;
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         ZonedDateTime lookupShift = now.minusHours(lookupStartTimeShiftInHours);

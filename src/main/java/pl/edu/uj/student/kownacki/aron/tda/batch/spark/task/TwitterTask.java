@@ -13,7 +13,6 @@ import org.apache.spark.streaming.twitter.TwitterUtils;
 import org.bson.Document;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
 import com.mongodb.spark.MongoSpark;
 import lombok.extern.slf4j.Slf4j;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
@@ -56,7 +55,7 @@ public class TwitterTask implements Serializable {
                                 .receivedAt(status.getCreatedAt().getTime()).build()).map(tweet -> {
                             log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + tweet.getCountries());
                             Document document = new Document();
-                            document.put("countries", tweet.getCountries().isEmpty() ? null : new Gson().toJson(tweet.getCountries()));
+                            document.put("countries", tweet.getCountries().isEmpty() ? null : tweet.getCountries().stream().map(Enum::toString).collect(Collectors.toSet()));
                             document.put("favoriteCountLambda", tweet.getFavoriteCountLambda());//todo count fav and retweets
                             document.put("favoriteCount", tweet.getFavoriteCount());
                             document.put("statusId", tweet.getStatusId());

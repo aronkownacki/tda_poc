@@ -1,6 +1,9 @@
 package pl.edu.uj.student.kownacki.aron.tda.batch.scheduled;
 
+import static pl.edu.uj.student.kownacki.aron.tda.batch.config.Profile.DRY_RUN;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +17,7 @@ import pl.edu.uj.student.kownacki.aron.tda.batch.service.TwitterService;
  */
 @Slf4j
 @Component
+@Profile("!" + DRY_RUN)
 public class ScheduledJob {
 
     @Autowired
@@ -22,7 +26,7 @@ public class ScheduledJob {
     @Autowired
     private ReportDataService reportDataService;
 
-//    @Scheduled(fixedRate = 15 * 60 * 1000)
+    @Scheduled(cron = "0 15 * ? * *")
     public void runFavoriteCounting() {
         twitterService.favoriteCounting();
     }

@@ -35,14 +35,14 @@ import pl.edu.uj.student.kownacki.aron.tda.batch.service.ReportDataService;
  * Created by Aron Kownacki on 14.08.2017.
  */
 @Service
-public class ReportServiceImpl implements ReportDataService {
+public class ReportDataServiceImpl implements ReportDataService {
 
     @Autowired
     private ReportDataRepository reportDataRepository;
 
     private Map<Country, List<List<Double>>> inMemoryReportData = null;
 
-    public ReportServiceImpl() {
+    public ReportDataServiceImpl() {
         this.inMemoryReportData = buildFullReport();
     }
 

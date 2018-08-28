@@ -4,13 +4,13 @@ var seriesOptions = [],
     mainChart;
 
 $.when(
-    $.getJSON('http://localhost:10400/report/metadata/countries', function (data) {
+    $.getJSON('/report/metadata/countries', function (data) {
         names = data;
     })
 ).then(function(){
     $.each(names, function (i, name) {
 
-        $.getJSON('http://localhost:10400/report/' + name.toLowerCase(), function (data) {
+        $.getJSON('/report/' + name.toLowerCase(), function (data) {
 
             seriesOptions[i] = {
                 name: name,

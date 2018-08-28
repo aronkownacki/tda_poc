@@ -1,5 +1,7 @@
 package pl.edu.uj.student.kownacki.aron.tda.batch.config;
 
+import static pl.edu.uj.student.kownacki.aron.tda.batch.config.Profile.DRY_RUN;
+
 import java.util.concurrent.Executor;
 
 import org.apache.spark.SparkConf;
@@ -9,6 +11,7 @@ import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -46,8 +49,14 @@ public class ApplicationConfig {
     @Bean
     public TwitterTask twitterTask(JavaStreamingContext javaStreamingContext, Authorization authorization) throws Exception {
         TwitterTask twitterTask = new TwitterTask(javaStreamingContext, authorization);
-        twitterTask.start();
         return twitterTask;
+    }
+
+    @Bean
+    @Profile("!" + DRY_RUN)
+    public Object startTwitterTask(TwitterTask twitterTask) throws Exception {
+        twitterTask.start();
+        return new Object();
     }
 
     @Bean

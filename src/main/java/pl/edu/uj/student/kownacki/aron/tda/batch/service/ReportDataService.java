@@ -13,7 +13,9 @@ public interface ReportDataService {
 
     List<List<Double>> getRandomReport(Country country);
 
-    List<List<Double>> getReport(Country country, Granularity granularity);
+    List<List<Double>> getFullReport(Country country, Granularity granularity);
+
+    List<List<Double>> get24Report(Country country, Granularity granularity);
 
     void update(Map<Country, Long> updateMap);
 

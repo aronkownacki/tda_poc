@@ -62,8 +62,15 @@ public class ReportDataServiceImpl implements ReportDataService {
     }
 
     @Override
-    public List<List<Double>> getReport(Country country, Granularity granularity) {
+    public List<List<Double>> getFullReport(Country country, Granularity granularity) {
         return reportDataRepository.findByCountryNameAndGranularity(country, granularity).stream().map(rd -> asList((double) rd.getTimestamp(), (double) rd.getCount())).sorted((o1, o2) -> o1.get(0).compareTo(o2.get(0))).collect(toList());
+    }
+
+    @Override
+    public List<List<Double>> get24Report(Country country, Granularity granularity) {
+
+        Long minus24hours = getNowInMillis() - (24 * 3600 * 1000);
+        return reportDataRepository.findByCountryNameAndGranularity(country, granularity, minus24hours).stream().map(rd -> asList((double) rd.getTimestamp(), (double) rd.getCount())).sorted((o1, o2) -> o1.get(0).compareTo(o2.get(0))).collect(toList());
     }
 
     @Override

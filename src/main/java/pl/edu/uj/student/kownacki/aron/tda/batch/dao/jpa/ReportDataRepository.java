@@ -19,6 +19,9 @@ import pl.edu.uj.student.kownacki.aron.tda.batch.model.ReportData;
 @Repository
 public interface ReportDataRepository extends CrudRepository<ReportData, Long> {
 
+    @Query("select rd from ReportData rd where rd.countryName = :countryName and rd.granularity = :granularity and rd.timestamp >= :beginTimestamp")
+    List<ReportData> findByCountryNameAndGranularity(@Param("countryName") Country countryName, @Param("granularity") Granularity granularity, @Param("beginTimestamp") Long beginTimestamp);
+
     List<ReportData> findByCountryNameAndGranularity(Country countryName, Granularity granularity);
 
     Page<ReportData> findByCountryNameAndGranularity(Country countryName, Granularity granularity, Pageable pageable);

@@ -16,6 +16,13 @@ import twitter4j.Status;
  * Created by Aron Kownacki on 20.06.2018.
  */
 public class TwitterHelperTest {
+
+    @Test
+    public void shouldPerformSentimentAnalysis() throws Exception {
+
+//        SentiStrength sentiStrength = new SentiStrength();
+    }
+
     @Test
     public void shouldExtractCountriesFromText() throws Exception {
 

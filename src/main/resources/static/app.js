@@ -16,7 +16,7 @@ function connect() {
     var socket = new SockJS('/websocket');
     stompClient = Stomp.over(socket);
     stompClient.connect({}, function (frame) {
-        startSparkJob();
+//        startSparkJob();
         setConnected(true);
         console.log('Connected: ' + frame);
         stompClient.subscribe('/stream/output', function (greeting) {
@@ -28,7 +28,7 @@ function connect() {
 function disconnect() {
     if (stompClient != null) {
         stompClient.disconnect();
-        stopSparkJob();
+//        stopSparkJob();
     }
     setConnected(false);
     console.log("Disconnected");
@@ -58,3 +58,62 @@ $(function () {
     $( "#connect" ).click(function() { connect(); });
     $( "#disconnect" ).click(function() { disconnect(); });
 });
+
+function showChart() {
+    var x = document.getElementById("chartContainer");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+        document.getElementById("tweetsContainer").style.display = "block";
+        document.getElementById("usersContainer").style.display = "block";
+    }
+}
+
+function showTweets() {
+    var x = document.getElementById("tweetsContainer");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+        document.getElementById("chartContainer").style.display = "block";
+        document.getElementById("usersContainer").style.display = "block";
+        showTweetList();
+
+    }
+}
+
+function showUsers() {
+    var x = document.getElementById("usersContainer");
+    if (x.style.display === "none") {
+        x.style.display = "block";
+    } else {
+        x.style.display = "none";
+        document.getElementById("chartContainer").style.display = "block";
+        document.getElementById("tweetsContainer").style.display = "block";
+    }
+}
+
+function showTweetList(){
+    $('#tweetsContainer').empty();
+    var tweets = [];
+    $.when(
+         $.getJSON('/report/tweets', function (data) {
+            tweets = data;
+         })
+    ).then(function(){
+        $.each(tweets, function (i, tweet) {
+            $("#tweetsContainer").prepend("<div class=\"tweet\" id=\"" + tweet.tweet_id + "\"></div>");
+        })
+
+        setTimeout(function (){
+
+           embedTweets();
+
+        }, 100);
+
+
+    })
+
+
+}

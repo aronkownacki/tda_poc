@@ -10,7 +10,7 @@ $.when(
 ).then(function(){
     $.each(names, function (i, name) {
 
-        $.getJSON('/report/' + name.toLowerCase(), function (data) {
+        $.getJSON('/report/' + name.toLowerCase() + '/24', function (data) {
 
             seriesOptions[i] = {
                 name: name,
@@ -113,9 +113,5 @@ function createChart() {
     });
 };
 
-var y = 30;
-$('#button').click(function () {
-    y += 10
-    mainChart.series[0].data[0].update(y);
-    mainChart.redraw();
-});
+
+

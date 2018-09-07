@@ -4,17 +4,20 @@
     <title>Twitter stream experimental</title>
     <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="/main.css" rel="stylesheet">
+    <link href="/tweet.css" rel="stylesheet">
     <script src="/webjars/jquery/jquery.min.js"></script>
     <script src="/webjars/sockjs-client/sockjs.min.js"></script>
     <script src="/webjars/stomp-websocket/stomp.min.js"></script>
-    <script src="/app.js"></script>
+    <script src="/tweets.js"></script>
     <script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"></script>
     <script src="https://code.highcharts.com/stock/highstock.js"></script>
     <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="http://platform.twitter.com/widgets.js"></script>
     <script src="/report-theme.js"></script>
-    <script src="/report.js"></script>
+    <script src="/app.js"></script>
+    <!--<script src="/report.js"></script>-->
 
 </head>
 <!--<body style="background-color:black;">-->
@@ -26,12 +29,18 @@
     <!--<p class="greeting-id">The ID is </p>-->
     <!--<p class="greeting-content">The content is </p>-->
 <!--</div>-->
-
-<button id="button" class="autocompare">Update</button>
-<div id="gap" style="height: 50px; min-width: 100%">
+<div id="gap1" style="height: 10px; min-width: 100%">
+<button id="showChartButton" onclick="showChart()">Chart</button>
+<button id="showTweetsButton" onclick="showTweets()">Last tweets</button>
+<button id="showUsersButton" onclick="showUsers()">Top users</button>
+<div id="gap2" style="height: 10px; min-width: 100%">
 </div>
-<div id="container" style="height: 600px; min-width: 100%"></div>
-<!--<div id="main-content" class="container">-->
+<div id="chartContainer" style="height: 600px; min-width: 100%"></div>
+<div id="tweetsContainer" style="height: 600px; min-width: 100%"></div>
+<div id="usersContainer" style="height: 600px; min-width: 100%">
+    users
+</div>
+<!--<div id="main-content" class="container4">-->
     <!--<div class="row">-->
         <!--<div class="col-md-6">-->
             <!--<form class="form-inline">-->

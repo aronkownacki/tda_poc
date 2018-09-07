@@ -29,6 +29,10 @@ public class TwitterHelper {
             })).collect(toSet());
         }
 
+        public static int getPopularity(Status status) {
+            return status.getFavoriteCount() + status.getRetweetCount();
+        }
+
         public static Boolean acceptedStatus(Status status){
             return !status.isRetweet();
         }

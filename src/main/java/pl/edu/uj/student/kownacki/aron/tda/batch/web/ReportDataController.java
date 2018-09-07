@@ -17,6 +17,7 @@ import com.google.common.collect.Sets;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Granularity;
 import pl.edu.uj.student.kownacki.aron.tda.batch.service.ReportDataService;
+import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TaskQuery;
 
 /**
  * Created by Aron Kownacki on 16.08.2017.
@@ -26,11 +27,19 @@ import pl.edu.uj.student.kownacki.aron.tda.batch.service.ReportDataService;
 public class ReportDataController {
 
     @Autowired
+    private TaskQuery taskQuery;
+
+    @Autowired
     private ReportDataService reportService;
 
     @RequestMapping(value = "/{country}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<List<Double>> getHourlyReport(@PathVariable String country) {
-        return reportService.getReport(Country.valueOf(country.toUpperCase()), Granularity.HOUR);
+    public List<List<Double>> getFullReport(@PathVariable String country) {
+        return reportService.getFullReport(Country.valueOf(country.toUpperCase()), Granularity.HOUR);
+    }
+
+    @RequestMapping(value = "/{country}/24", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<List<Double>> get24Report(@PathVariable String country) {
+        return reportService.get24Report(Country.valueOf(country.toUpperCase()), Granularity.MILLISECOND);
     }
 
     @RequestMapping(value = "/metadata/countries", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -43,5 +52,15 @@ public class ReportDataController {
     @RequestMapping(value = "/update", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_VALUE)
     public void updateReport(@RequestBody Map<Country, Long> updateMap) {
         reportService.update(updateMap);
+    }
+
+    @RequestMapping(value ="/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getTopUsers(){
+        return taskQuery.runQuery("select * from users order by tweet_count desc limit 20").toString();
+    }
+
+    @RequestMapping(value ="/tweets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String getLastTweets(){
+        return taskQuery.runQuery("select * from tweets order by popularity desc limit 20").toString();
     }
 }

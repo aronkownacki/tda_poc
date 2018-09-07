@@ -9,6 +9,8 @@ import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -18,6 +20,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
+import pl.edu.uj.student.kownacki.aron.tda.batch.config.properties.TwitterAccountConfigProperties;
 import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TwitterTask;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
@@ -32,8 +35,12 @@ import twitter4j.conf.ConfigurationBuilder;
 @EnableScheduling
 @EnableJpaRepositories(basePackages = "pl.edu.uj.student.kownacki.aron.tda.batch.dao.jpa")
 @EnableMongoRepositories(basePackages = "pl.edu.uj.student.kownacki.aron.tda.batch.dao.mongo")
+@EnableConfigurationProperties(TwitterAccountConfigProperties.class)
 @Configuration
 public class ApplicationConfig {
+
+    @Autowired
+    private TwitterAccountConfigProperties twitterAccountConfigProperties;
 
     @Bean
     public Executor asyncExecutor() {
@@ -47,8 +54,8 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public TwitterTask twitterTask(JavaStreamingContext javaStreamingContext, Authorization authorization) throws Exception {
-        TwitterTask twitterTask = new TwitterTask(javaStreamingContext, authorization);
+    public TwitterTask twitterTask(JavaStreamingContext javaStreamingContext, Authorization authorization, SparkSession sparkSession) throws Exception {
+        TwitterTask twitterTask = new TwitterTask(javaStreamingContext, authorization, sparkSession);
         return twitterTask;
     }
 
@@ -75,8 +82,7 @@ public class ApplicationConfig {
 
     @Bean
     public JavaStreamingContext javaStreamingContext() {
-        SparkConf conf = new SparkConf().setAppName("tda_poc")
-            .setMaster("local[*]");
+        SparkConf conf = new SparkConf().setAppName("tda_poc").setMaster("local[*]");
 
         conf.set("spark.cores.max", "4");
         conf.set("spark.executor.instances", "2");
@@ -91,10 +97,10 @@ public class ApplicationConfig {
     @Bean
     public twitter4j.conf.Configuration configuration() {
         ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
-                .setOAuthConsumerKey("kH4RSvKyqz9mH9P3RDf1xyBwr")
-                .setOAuthConsumerSecret("EYa00u0wpdLY9Z21a5yd2jX1BQMALPFmF1GgjQA7eDZQyiosjR")
-                .setOAuthAccessToken("871418083407265792-IqNyZeV72b692P81LRWdoFzHJsxIDk2")
-                .setOAuthAccessTokenSecret("MAlFDhMfoPwTINB1gZ4a95Dc8CsBpkPKYnjSmLZpUIxQZ")
+                .setOAuthConsumerKey(twitterAccountConfigProperties.getConsumerKey())
+                .setOAuthConsumerSecret(twitterAccountConfigProperties.getConsumerSecret())
+                .setOAuthAccessToken(twitterAccountConfigProperties.getAccessToken())
+                .setOAuthAccessTokenSecret(twitterAccountConfigProperties.getAccessTokenSecret())
                 .setTweetModeExtended(true);
 
         return configurationBuilder.build();

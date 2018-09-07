@@ -2,7 +2,7 @@ package pl.edu.uj.student.kownacki.aron.tda.batch.web;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,8 +33,8 @@ public class StreamController {
         task.stop();
     }
 
-    @RequestMapping(value = "/new", method = RequestMethod.POST)
-    public void newPost(@RequestBody String newPost) {
+    @RequestMapping(value = "/new/{msg}", method = RequestMethod.GET)
+    public void newPost(@PathVariable("msg") String newPost) {
         template.convertAndSend("/stream/output", new StreamOutput("new: " + newPost));
     }
 

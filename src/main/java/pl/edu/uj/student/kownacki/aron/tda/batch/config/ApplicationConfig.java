@@ -17,7 +17,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import pl.edu.uj.student.kownacki.aron.tda.batch.config.properties.TwitterAccountConfigProperties;
-import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TwitterTask;
+import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.StreamingTask;
+import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.impl.TwitterStreamingTaskImpl;
 import twitter4j.Twitter;
 import twitter4j.TwitterFactory;
 import twitter4j.auth.Authorization;
@@ -46,14 +47,13 @@ public class ApplicationConfig {
     }
 
     @Bean
-    public TwitterTask twitterTask(JavaStreamingContext javaStreamingContext, Authorization authorization, SparkSession sparkSession) throws Exception {
-        TwitterTask twitterTask = new TwitterTask(javaStreamingContext, authorization, sparkSession);
-        return twitterTask;
+    public StreamingTask twitterTask(JavaStreamingContext javaStreamingContext, Authorization authorization, SparkSession sparkSession) {
+        return new TwitterStreamingTaskImpl(javaStreamingContext, authorization, sparkSession);
     }
 
     @Bean
     @Profile("!" + DRY_RUN)
-    public Object startTwitterTask(TwitterTask twitterTask) throws Exception {
+    public Object startTwitterTask(StreamingTask twitterTask) {
         twitterTask.start();
         return new Object();
     }
@@ -68,7 +68,6 @@ public class ApplicationConfig {
 
     @Bean
     public SparkSession sparkSession(JavaSparkContext javaSparkContext) {
-
         return new SparkSession(javaSparkContext.sc());
     }
 

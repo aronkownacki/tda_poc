@@ -3,19 +3,13 @@ package pl.edu.uj.student.kownacki.aron.tda.batch.service.impl;
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static pl.edu.uj.student.kownacki.aron.tda.batch.utils.DateTimeUtils.getNowInMillis;
 import static pl.edu.uj.student.kownacki.aron.tda.batch.utils.DateTimeUtils.getTimestampAtStartOfUnit;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -39,27 +33,6 @@ public class ReportDataServiceImpl implements ReportDataService {
 
     @Autowired
     private ReportDataRepository reportDataRepository;
-
-    private Map<Country, List<List<Double>>> inMemoryReportData = null;
-
-    public ReportDataServiceImpl() {
-        this.inMemoryReportData = buildFullReport();
-    }
-
-    //todo this is mock version
-    private Map<Country, List<List<Double>>> buildFullReport() {
-        LocalDateTime today = ZonedDateTime.now().toLocalDate().atStartOfDay();
-        return Arrays.stream(Country.values()).collect(toMap(country -> country, country -> {
-            List<List<Double>> list = IntStream.range(0, 10).boxed().map(i -> asList((double) today.atZone(ZoneId.systemDefault()).minusDays(i).toEpochSecond() * 1000, (double) Math.round(Math.random() * 100))).collect(toList());
-            list.sort((o1, o2) -> o1.get(0).compareTo(o2.get(0)));
-            return list;
-        }));
-    }
-
-    @Override
-    public List<List<Double>> getRandomReport(Country country) {
-        return inMemoryReportData.get(country);
-    }
 
     @Override
     public List<List<Double>> getFullReport(Country country, Granularity granularity) {
@@ -88,8 +61,6 @@ public class ReportDataServiceImpl implements ReportDataService {
                 }).collect(toList())
 
         );
-
-        updateInMemoryReportData(updateMap, nowInMillis);
     }
 
     @Override
@@ -141,13 +112,5 @@ public class ReportDataServiceImpl implements ReportDataService {
             pageRequest = toAggregate.nextPageable();
         }
 
-    }
-
-    private void updateInMemoryReportData(Map<Country, Long> updateMap, double nowInMillis) {
-        updateMap.forEach((country, count) -> {
-            inMemoryReportData.get(country).add(asList(nowInMillis, (double) count));
-        });
-
-        stream(Country.values()).filter(c -> !updateMap.keySet().contains(c)).forEach(country -> inMemoryReportData.get(country).add(asList(nowInMillis, 0.0)));
     }
 }

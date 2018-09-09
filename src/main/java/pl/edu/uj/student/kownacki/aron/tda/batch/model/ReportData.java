@@ -1,5 +1,7 @@
 package pl.edu.uj.student.kownacki.aron.tda.batch.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,7 +24,7 @@ import lombok.ToString;
 @EqualsAndHashCode
 @Entity
 @Table(name = "report_data")
-public class ReportData {
+public class ReportData  implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

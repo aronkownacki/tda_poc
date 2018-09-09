@@ -25,6 +25,8 @@ import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.twitter.TwitterUtils;
 
 import com.mongodb.spark.MongoSpark;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
 import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.StreamingTask;
@@ -38,12 +40,14 @@ import twitter4j.auth.Authorization;
  * Created by Aron Kownacki on 05.06.2017.
  */
 @Slf4j
+@Getter
+@Setter
 public class TwitterStreamingTaskImpl implements StreamingTask, Serializable {
 
-    private final SparkSession sparkSession;
-    private JavaStreamingContext sc;
+    private SparkSession sparkSession;
+    private transient JavaStreamingContext sc;
 
-    private Thread thread;
+    private transient Thread thread;
 
     public TwitterStreamingTaskImpl(JavaStreamingContext sc, Authorization twitterAuth, SparkSession sparkSession) {
         this.sc = sc;
@@ -57,6 +61,8 @@ public class TwitterStreamingTaskImpl implements StreamingTask, Serializable {
         String[] filter = Country.getAllHashtags();
 
         JavaReceiverInputDStream<Status> inputStatusStream = TwitterUtils.createStream(sc, twitterAuth, filter);
+
+        inputStatusStream.mapToPair(status -> new Tuple2<>(valueOf(status.getId()), 1)).count().print();
 
         JavaDStream<Status> originalStatusStream =  inputStatusStream.map(status -> status.isRetweet() ? status.getRetweetedStatus() : status);
 

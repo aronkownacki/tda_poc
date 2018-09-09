@@ -3,6 +3,7 @@ package pl.edu.uj.student.kownacki.aron.tda.batch.utils;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.containsIgnoreCase;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ import twitter4j.Status;
  * Created by Aron Kownacki on 20.06.2018.
  */
 @Slf4j
-public class TwitterHelper {
+public class TwitterHelper  implements Serializable {
 
     public static Set<Country> extractCountries(Status status) {
         String statusHashtags = Arrays.stream(status.getHashtagEntities()).map(HashtagEntity::getText).collect(Collectors.joining(","));

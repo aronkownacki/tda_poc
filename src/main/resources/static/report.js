@@ -10,7 +10,9 @@ $.when(
 ).then(function(){
     $.each(names, function (i, name) {
 
-        $.getJSON('/report/' + name.toLowerCase() + '/24', function (data) {
+// 24 hours period
+//        $.getJSON('/report/' + name.toLowerCase() + '/24', function (data) {
+        $.getJSON('/report/' + name.toLowerCase(), function (data) {
 
             seriesOptions[i] = {
                 name: name,

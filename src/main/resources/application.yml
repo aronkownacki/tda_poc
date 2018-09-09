@@ -22,7 +22,7 @@ spring:
     version: '3.2.2'
     features: SYNC_DELAY, TEXT_SEARCH, STORAGE_ENGINE
     storage:
-      databaseDir: 'e:/tmp/mongo/embedded'
+      databaseDir: '${java.io.tmpdir}/mongo'
       oplogSize: 10
 server:
   port: 10400

@@ -1,12 +1,13 @@
 package pl.edu.uj.student.kownacki.aron.tda.batch.utils;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.TemporalUnit;
 
-public class DateTimeUtils {
+public class DateTimeUtils implements Serializable {
 
     private static final long MILLISESONDS_IN_SECOND = 1000L;
 

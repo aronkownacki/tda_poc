@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.spark.api.java.JavaSparkContext;
 import org.apache.spark.sql.SparkSession;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,9 +42,6 @@ public class TestViewController {
     private SimpMessagingTemplate template;
 
     @Autowired
-    private JavaSparkContext sc;
-
-    @Autowired
     private SparkSession ss;
 
     @Autowired
@@ -59,11 +55,6 @@ public class TestViewController {
 
     @Autowired(required = false)
     private ScheduledJob scheduledJob;
-
-    @RequestMapping("/sparkContext")
-    public String sparkContext() {
-        return "result count is: " + sc.textFile("c:/tmp/tds_poc/tweets/*/*").count();
-    }
 
     @RequestMapping("/h2")
     public String test() {

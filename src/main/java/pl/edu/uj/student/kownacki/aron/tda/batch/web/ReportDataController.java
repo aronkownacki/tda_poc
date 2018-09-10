@@ -17,7 +17,7 @@ import com.google.common.collect.Sets;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Country;
 import pl.edu.uj.student.kownacki.aron.tda.batch.model.Granularity;
 import pl.edu.uj.student.kownacki.aron.tda.batch.service.ReportDataService;
-import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TaskQuery;
+import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.QueryTask;
 
 /**
  * Created by Aron Kownacki on 16.08.2017.
@@ -27,7 +27,7 @@ import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TaskQuery;
 public class ReportDataController {
 
     @Autowired
-    private TaskQuery taskQuery;
+    private QueryTask queryTask;
 
     @Autowired
     private ReportDataService reportService;
@@ -56,11 +56,11 @@ public class ReportDataController {
 
     @RequestMapping(value ="/users", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getTopUsers(){
-        return taskQuery.runQuery("select * from users order by tweet_count desc limit 20").toString();
+        return queryTask.runQuery("select * from users order by tweet_count desc limit 20").toString();
     }
 
     @RequestMapping(value ="/tweets", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public String getLastTweets(){
-        return taskQuery.runQuery("select * from tweets order by popularity desc limit 20").toString();
+        return queryTask.runQuery("select * from tweets order by popularity desc limit 20").toString();
     }
 }

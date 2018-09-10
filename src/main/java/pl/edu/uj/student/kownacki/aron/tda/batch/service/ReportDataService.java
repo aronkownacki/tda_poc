@@ -11,8 +11,6 @@ import pl.edu.uj.student.kownacki.aron.tda.batch.model.Granularity;
  */
 public interface ReportDataService {
 
-    List<List<Double>> getRandomReport(Country country);
-
     List<List<Double>> getFullReport(Country country, Granularity granularity);
 
     List<List<Double>> get24Report(Country country, Granularity granularity);

@@ -8,14 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.extern.slf4j.Slf4j;
-import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.TaskQuery;
+import pl.edu.uj.student.kownacki.aron.tda.batch.spark.task.QueryTask;
 
 /**
  * Created by Aron Kownacki on 05.06.2017.
  */
 @Slf4j
 @Service
-public class TwitterTaskQueryImpl implements TaskQuery, Serializable {
+public class TwitterQueryTaskImpl implements QueryTask, Serializable {
 
     @Autowired
     private SparkSession sparkSession;

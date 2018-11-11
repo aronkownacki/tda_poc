@@ -3,6 +3,7 @@ var seriesOptions = [],
     names = [],
     mainChart;
 
+function showChartScreen() {
 $.when(
     $.getJSON('/report/metadata/countries', function (data) {
         names = data;
@@ -12,6 +13,8 @@ $.when(
 
 // 24 hours period
 //        $.getJSON('/report/' + name.toLowerCase() + '/24', function (data) {
+//        $.getJSON('/report/' + name.toLowerCase() + '/24/MILLISECOND', function (data) {
+// full report
         $.getJSON('/report/' + name.toLowerCase(), function (data) {
 
             seriesOptions[i] = {
@@ -30,10 +33,11 @@ $.when(
     });
 
 });
+};
 
 function createChart() {
 
-    mainChart = Highcharts.stockChart('container', {
+    mainChart = Highcharts.stockChart('chartContainer', {
 
 //        chart: {
 //            events: {
@@ -58,7 +62,7 @@ function createChart() {
         chart: {
             type: 'area',
             borderWidth: 2,
-            height: 400 + (seriesCounter * 35)
+            height: 600 + (seriesCounter * 35)
         },
 
         title:{

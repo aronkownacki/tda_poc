@@ -60,38 +60,24 @@ $(function () {
 });
 
 function showChart() {
-    var x = document.getElementById("chartContainer");
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-        document.getElementById("tweetsContainer").style.display = "block";
-        document.getElementById("usersContainer").style.display = "block";
-    }
+    document.getElementById("chartContainer").style.display = "block";
+    document.getElementById("tweetsContainer").style.display = "none";
+    document.getElementById("usersContainer").style.display = "none";
+    showChartScreen();
 }
 
 function showTweets() {
-    var x = document.getElementById("tweetsContainer");
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-        document.getElementById("chartContainer").style.display = "block";
-        document.getElementById("usersContainer").style.display = "block";
-        showTweetList();
-
-    }
+    document.getElementById("chartContainer").style.display = "none";
+    document.getElementById("tweetsContainer").style.display = "block";
+    document.getElementById("usersContainer").style.display = "none";
+    showTweetList();
 }
 
 function showUsers() {
-    var x = document.getElementById("usersContainer");
-    if (x.style.display === "none") {
-        x.style.display = "block";
-    } else {
-        x.style.display = "none";
-        document.getElementById("chartContainer").style.display = "block";
-        document.getElementById("tweetsContainer").style.display = "block";
-    }
+    document.getElementById("chartContainer").style.display = "none";
+    document.getElementById("tweetsContainer").style.display = "none";
+    document.getElementById("usersContainer").style.display = "block";
+    showUsersList();
 }
 
 function showTweetList(){
@@ -111,9 +97,19 @@ function showTweetList(){
            embedTweets();
 
         }, 100);
-
-
     })
+}
 
-
+function showUsersList(){
+    $('#usersContainer').empty();
+    var tweets = [];
+    $.when(
+         $.getJSON('/report/users', function (data) {
+            tweets = data;
+         })
+    ).then(function(){
+        $.each(tweets, function (i, tweet) {
+            $("#usersContainer").prepend("<div>" + tweet.user + " "+ tweet.tweet_count + "</div>");
+        })
+    })
 }

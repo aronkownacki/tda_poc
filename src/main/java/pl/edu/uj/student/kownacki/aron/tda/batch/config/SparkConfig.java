@@ -55,7 +55,6 @@ public class SparkConfig {
         SparkConf conf = new SparkConf().setAppName("tda_poc").setMaster("local[*]");
 
         conf.set("spark.cores.max", "4");
-        conf.set("spark.executor.instances", "2");
         conf.set("spark.dynamicAllocation.enabled", "false");
 
         conf.set("spark.mongodb.input.uri", "mongodb://127.0.0.1/test.tweets");

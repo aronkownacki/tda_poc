@@ -18,6 +18,8 @@ public interface TweetRepository extends MongoRepository<Tweet, String> {
 
     Page<Tweet> findByReceivedAtLessThan(Long ReceivedAt, Pageable pageable);
 
+    Page<Tweet> findByReceivedAtBetween(Long from, Long to, Pageable pageable);
+
     Page<Tweet> findByCountriesIsNullAndReceivedAtGreaterThan(Long rceeivedAt, Pageable pageable);
 
     Page<Tweet> findByCountries(Set<Country> countries, Pageable pageable);

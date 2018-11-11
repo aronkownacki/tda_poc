@@ -78,14 +78,15 @@ public class TestViewController {
 //        long emptyCount = all.stream().filter(t -> t.getCountries() != null && t.getCountries().size() == 0).count();
 //        Tweet lastEmpty = all.stream().filter(t -> t.getCountries() != null && t.getCountries().size() == 0).sorted((o1, o2) -> o1.getReceivedAt().compareTo(o2.getReceivedAt())).findFirst().get();
 
-        long lastDay = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1).toInstant().toEpochMilli();
-        Tweet lastEmpty = tweetRepository.findByCountriesIsNullAndReceivedAtGreaterThan(new Long(0), new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);;
-        Tweet lastStoredStatus = tweetRepository.findAll(new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);
-        String info = "Mongo stores " + tweetRepository.count() + " tweets, last stored: " + linkToStatus(lastStoredStatus);
-        String lastEmptyInfo = "Last invalid status: "  + linkToStatus(lastEmpty);
-
-//        return  "<br> empty countries: " + emptyCount + "<br> last empty: " + lastEmpty +"<br>" + info;
-        return  info + "<br>" + lastEmptyInfo;
+//        long lastDay = ZonedDateTime.now(ZoneOffset.UTC).minusDays(1).toInstant().toEpochMilli();
+//        Tweet lastEmpty = tweetRepository.findByCountriesIsNullAndReceivedAtGreaterThan(new Long(0), new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);;
+//        Tweet lastStoredStatus = tweetRepository.findAll(new PageRequest(0, 1, Sort.Direction.DESC, "receivedAt")).getContent().get(0);
+//        String info = "Mongo stores " + tweetRepository.count() + " tweets, last stored: " + linkToStatus(lastStoredStatus);
+//        String lastEmptyInfo = "Last invalid status: "  + linkToStatus(lastEmpty);
+//
+////        return  "<br> empty countries: " + emptyCount + "<br> last empty: " + lastEmpty +"<br>" + info;
+//        return  info + "<br>" + lastEmptyInfo;
+        return "mongo: " + tweetRepository.count() + ", H2: " + reportDataRepository.count();
     }
 
     private static String linkToStatus(Tweet status) {

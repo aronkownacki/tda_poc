@@ -37,15 +37,23 @@ public class ReportDataController {
         return reportService.getFullReport(Country.valueOf(country.toUpperCase()), Granularity.HOUR);
     }
 
-    @RequestMapping(value = "/{country}/24", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{country}/24/MILLISECOND", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<List<Double>> get24Report(@PathVariable String country) {
         return reportService.get24Report(Country.valueOf(country.toUpperCase()), Granularity.MILLISECOND);
+    }
+
+    @RequestMapping(value = "/{country}/24", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<List<Double>> get24ReportHourly(@PathVariable String country) {
+        return reportService.get24Report(Country.valueOf(country.toUpperCase()), Granularity.HOUR);
     }
 
     @RequestMapping(value = "/metadata/countries", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Country> getSupportedCoutries() {
         Set<Country> countries = Sets.newHashSet(Country.values());
         countries.remove(Country.EU);
+        countries.clear();
+        countries.add(Country.UNITED_KINGDOM);
+        countries.add(Country.POLAND);
         return new ArrayList<>(countries);
     }
 
